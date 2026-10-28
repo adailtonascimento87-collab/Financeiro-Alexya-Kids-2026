@@ -86,14 +86,23 @@
     <script>
         // Configuração do Firebase
         // ATENÇÃO: Substitua os dados abaixo com os dados do seu projeto no Firebase Console!
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJECT_ID_AQUI",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
-        };
+       // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCR3k3_5gjIfDeZqORC8Dhz4q0lsGWsi08",
+  authDomain: "financeiro-alexya-kids-2026.firebaseapp.com",
+  projectId: "financeiro-alexya-kids-2026",
+  storageBucket: "financeiro-alexya-kids-2026.firebasestorage.app",
+  messagingSenderId: "223204491487",
+  appId: "1:223204491487:web:b06093954d2bc47dc1a96a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
         // Inicializa o Firebase
         if (!firebase.apps.length) {

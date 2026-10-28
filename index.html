@@ -1,328 +1,304 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Financeiro 2026</title>
-    
-    <!-- Scripts & Bibliotecas -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Firebase SDK (v10 / Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Financeiro 2026 - Alexya Kids</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <!-- Firebase SDKs (Versão Compatível - Sem Erro de Módulo) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body class="min-h-screen pb-20 text-slate-800">
 
-    <!-- Modal Customizado de Alerta -->
-    <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
-            <h3 class="text-lg font-black text-slate-800 mb-2" id="modalTitle">Aviso</h3>
-            <p class="text-sm text-slate-600 mb-6" id="modalMessage">Mensagem do sistema</p>
-            <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl">
-                Entendi
-            </button>
+  <!-- Modal Customizado de Alerta -->
+  <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 text-center">
+      <h3 class="text-lg font-black text-slate-800 mb-2" id="modalTitle">Aviso</h3>
+      <p class="text-sm text-slate-600 mb-6" id="modalMessage">Mensagem do sistema</p>
+      <button onclick="closeModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition">Entendi</button>
+    </div>
+  </div>
+
+  <!-- Cabeçalho -->
+  <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 shadow-lg text-white sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 h-20 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md">
+          <i data-lucide="wallet" class="w-7 h-7 text-blue-300"></i>
         </div>
+        <div>
+          <h1 class="font-black text-xl tracking-tight leading-none">Alexya Kids</h1>
+          <p class="text-xs text-blue-200 mt-1 font-medium">Controle Financeiro • 2026</p>
+        </div>
+      </div>
+      
+      <!-- Seleção de Mês/Ano -->
+      <div class="flex items-center gap-2 bg-white/10 p-1.5 rounded-xl backdrop-blur-md">
+        <i data-lucide="calendar" class="w-4 h-4 text-blue-300 ml-2"></i>
+        <select id="monthSelect" onchange="loadData()" class="bg-transparent text-sm font-semibold focus:outline-none cursor-pointer pr-2 text-white">
+          <option value="0" class="text-slate-800">Janeiro</option>
+          <option value="1" class="text-slate-800">Fevereiro</option>
+          <option value="2" class="text-slate-800">Março</option>
+          <option value="3" class="text-slate-800">Abril</option>
+          <option value="4" class="text-slate-800">Maio</option>
+          <option value="5" class="text-slate-800">Junho</option>
+          <option value="6" class="text-slate-800">Julho</option>
+          <option value="7" class="text-slate-800">Agosto</option>
+          <option value="8" class="text-slate-800">Setembro</option>
+          <option value="9" class="text-slate-800">Outubro</option>
+          <option value="10" class="text-slate-800">Novembro</option>
+          <option value="11" class="text-slate-800">Dezembro</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main id="mainContent" class="max-w-6xl mx-auto px-4 mt-6 fade-in">
+    
+    <!-- Cards de Resumo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Entradas</p>
+          <h3 id="totalIncomes" class="text-2xl font-black text-emerald-600 mt-1">R$ 0,00</h3>
+        </div>
+        <div class="bg-emerald-50 p-3 rounded-xl">
+          <i data-lucide="trending-up" class="w-6 h-6 text-emerald-600"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Saídas</p>
+          <h3 id="totalExpenses" class="text-2xl font-black text-rose-600 mt-1">R$ 0,00</h3>
+        </div>
+        <div class="bg-rose-50 p-3 rounded-xl">
+          <i data-lucide="trending-down" class="w-6 h-6 text-rose-600"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Saldo Atual</p>
+          <h3 id="totalBalance" class="text-2xl font-black text-blue-600 mt-1">R$ 0,00</h3>
+        </div>
+        <div class="bg-blue-50 p-3 rounded-xl">
+          <i data-lucide="dollar-sign" class="w-6 h-6 text-blue-600"></i>
+        </div>
+      </div>
     </div>
 
-    <!-- Cabeçalho -->
-    <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 shadow-lg text-white sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
-                    <i data-lucide="pie-chart" class="w-6 h-6 text-blue-100"></i>
-                </div>
-                <div>
-                    <h1 class="font-black text-lg tracking-tight uppercase bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
-                        Minhas Finanças 2026
-                    </h1>
-                    <span class="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sincronizado Firebase
-                    </span>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <select id="monthSelector" onchange="render()" class="bg-white/10 text-white border border-white/20 text-xs font-bold rounded-xl py-2 px-3 outline-none cursor-pointer">
-                    <option value="2026-09" selected class="text-slate-800">Setembro 2026</option>
-                    <option value="2026-10" class="text-slate-800">Outubro 2026</option>
-                    <option value="2026-11" class="text-slate-800">Novembro 2026</option>
-                    <option value="2026-12" class="text-slate-800">Dezembro 2026</option>
-                </select>
-            </div>
+    <!-- Formulário e Lista de Lançamentos -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Formulário -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i> Novo Lançamento
+        </h2>
+        <form id="financeForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Descrição</label>
+            <input type="text" id="desc" required placeholder="Ex: Venda de Roupas / Aluguel" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="amount" required placeholder="0,00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo</label>
+            <select id="type" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+              <option value="income">Entrada (Receita)</option>
+              <option value="expense">Saída (Despesa)</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-md shadow-blue-500/20">
+            <i data-lucide="check" class="w-4 h-4"></i> Salvar Registro
+          </button>
+        </form>
+      </div>
+
+      <!-- Tabela de Lançamentos -->
+      <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i data-lucide="list" class="w-5 h-5 text-blue-600"></i> Movimentações do Mês
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase">
+                <th class="py-3 px-2">Descrição</th>
+                <th class="py-3 px-2">Tipo</th>
+                <th class="py-3 px-2">Valor</th>
+                <th class="py-3 px-2 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsList" class="text-sm divide-y divide-slate-50">
+              <!-- Registros inseridos via JS -->
+            </tbody>
+          </table>
         </div>
-    </header>
+      </div>
 
-    <!-- Navegação de Abas -->
-    <div class="max-w-6xl mx-auto px-4 mt-6">
-        <nav class="flex bg-slate-200/60 p-1.5 rounded-2xl gap-1 border border-slate-200">
-            <button onclick="switchTab('RESUMO')" id="tab-RESUMO" class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-black transition-all bg-white text-blue-900 shadow-sm">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span>Resumo</span>
-            </button>
-            <button onclick="switchTab('VENDAS_LOJA')" id="tab-VENDAS_LOJA" class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500">
-                <i data-lucide="store" class="w-4 h-4"></i> <span>Vendas da Loja</span>
-            </button>
-            <button onclick="switchTab('ANUAL')" id="tab-ANUAL" class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500">
-                <i data-lucide="calendar-days" class="w-4 h-4"></i> <span>Anual</span>
-            </button>
-        </nav>
     </div>
+  </main>
 
-    <!-- Conteúdo Principal -->
-    <main id="mainContent" class="max-w-6xl mx-auto px-4 mt-6 fade-in"></main>
+  <script>
+    // 1. Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCR3k3_5gjIfDeZqORC8Dhz4q01sGWsio8",
+      authDomain: "financeiro-alexya-kids-2026.firebaseapp.com",
+      projectId: "financeiro-alexya-kids-2026",
+      storageBucket: "financeiro-alexya-kids-2026.firebasestorage.app",
+      messagingSenderId: "223204491487",
+      appId: "1:223204491487:web:b06093954d2bc47dc1a96a"
+    };
 
-    <script type="module">
-        // Configuração do Firebase
-        // ATENÇÃO: Substitua os dados abaixo com os dados do seu projeto no Firebase Console!
-       // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    // Inicialização do Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCR3k3_5gjIfDeZqORC8Dhz4q0lsGWsi08",
-  authDomain: "financeiro-alexya-kids-2026.firebaseapp.com",
-  projectId: "financeiro-alexya-kids-2026",
-  storageBucket: "financeiro-alexya-kids-2026.firebasestorage.app",
-  messagingSenderId: "223204491487",
-  appId: "1:223204491487:web:b06093954d2bc47dc1a96a"
-};
+    // Selecionar mês atual por padrão
+    document.getElementById('monthSelect').value = new Date().getMonth();
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+    // Carregar ícones do Lucide
+    lucide.createIcons();
 
-        // Inicializa o Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
+    // Função para exibir modal de aviso
+    function showModal(title, msg) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalMessage').innerText = msg;
+      const modal = document.getElementById('customModal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
 
-        let transactions = [];
-        let activeTab = 'RESUMO';
-        let resumoChart = null;
+    function closeModal() {
+      const modal = document.getElementById('customModal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
 
-        function showModal(title, message) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-            const modal = document.getElementById('customModal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-        }
+    // Guardar novo registro
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const desc = document.getElementById('desc').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+      const month = parseInt(document.getElementById('monthSelect').value);
 
-        function closeModal() {
-            const modal = document.getElementById('customModal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        }
+      try {
+        await db.collection("transactions").add({
+          description: desc,
+          amount: amount,
+          type: type,
+          month: month,
+          year: 2026,
+          createdAt: new Date()
+        });
 
-        function carregarDados() {
-            // Escuta em tempo real no Firebase Firestore
-            db.collection("se_lancamentos")
-              .orderBy("data", "desc")
-              .onSnapshot((snapshot) => {
-                  transactions = snapshot.docs.map(doc => {
-                      const item = doc.data();
-                      return {
-                          id: doc.id,
-                          descricao: item.descricao || 'Sem descrição',
-                          valor: parseFloat(item.valor) || 0,
-                          tipo: item.tipo || 'receita',
-                          categoria: item.categoria || 'Vendas Loja',
-                          data: item.data
-                      };
-                  });
-                  render();
-              }, (err) => {
-                  console.error('Erro ao carregar dados do Firebase:', err);
-              });
-        }
+        document.getElementById('financeForm').reset();
+        showModal("Sucesso!", "Lançamento registrado com sucesso.");
+        loadData();
+      } catch (err) {
+        showModal("Erro", "Erro ao salvar no banco de dados: " + err.message);
+      }
+    }
 
-        function switchTab(tab) {
-            activeTab = tab;
-            render();
-        }
+    // Carregar registros do banco
+    async function loadData() {
+      const selectedMonth = parseInt(document.getElementById('monthSelect').value);
+      const tbody = document.getElementById('transactionsList');
+      tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-400">Carregando dados...</td></tr>';
 
-        const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+      try {
+        const snapshot = await db.collection("transactions")
+          .where("month", "==", selectedMonth)
+          .where("year", "==", 2026)
+          .get();
 
-        function render() {
-            ['RESUMO', 'VENDAS_LOJA', 'ANUAL'].forEach(tab => {
-                const btn = document.getElementById(`tab-${tab}`);
-                if (btn) {
-                    if (tab === activeTab) {
-                        btn.className = "flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-black transition-all bg-white text-blue-900 shadow-md border border-slate-100";
-                    } else {
-                        btn.className = "flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-500 hover:text-slate-800";
-                    }
-                }
-            });
+        let incomes = 0;
+        let expenses = 0;
+        tbody.innerHTML = '';
 
-            const selectedMonth = document.getElementById('monthSelector').value;
-            const filtered = transactions.filter(t => t.data && t.data.startsWith(selectedMonth));
-            const totalFaturamento = filtered.reduce((acc, t) => acc + t.valor, 0);
-            const qtdVendas = filtered.length;
-            const ticketMedio = qtdVendas > 0 ? totalFaturamento / qtdVendas : 0;
+        if (snapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-400">Nenhum registro neste mês.</td></tr>';
+        } else {
+          snapshot.forEach(doc => {
+            const item = doc.data();
+            const id = doc.id;
 
-            const main = document.getElementById('mainContent');
+            if (item.type === 'income') incomes += item.amount;
+            else expenses += item.amount;
 
-            if (activeTab === 'RESUMO') {
-                main.innerHTML = `
-                    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 text-center max-w-xl mx-auto mb-6">
-                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">FATURAMENTO DO MÊS</p>
-                        <h2 class="text-4xl sm:text-5xl font-black text-emerald-500 tracking-tight">
-                            ${formatCurrency(totalFaturamento)}
-                        </h2>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-6">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-md flex justify-between items-center border-l-4 border-l-blue-500">
-                            <div>
-                                <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">QUANTIDADE DE VENDAS</p>
-                                <h3 class="text-2xl font-black text-blue-600">${qtdVendas}</h3>
-                            </div>
-                            <div class="p-3 bg-blue-50 text-blue-500 rounded-xl"><i data-lucide="shopping-bag" class="w-6 h-6"></i></div>
-                        </div>
-                        
-                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-md flex justify-between items-center border-l-4 border-l-purple-500">
-                            <div>
-                                <p class="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">TICKET MÉDIO</p>
-                                <h3 class="text-2xl font-black text-purple-600">${formatCurrency(ticketMedio)}</h3>
-                            </div>
-                            <div class="p-3 bg-purple-50 text-purple-500 rounded-xl"><i data-lucide="calculator" class="w-6 h-6"></i></div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 max-w-xl mx-auto mb-8">
-                        <h3 class="font-black text-slate-600 text-xs uppercase tracking-widest text-center mb-4">EVOLUÇÃO DIÁRIA DE VENDAS</h3>
-                        <div class="relative h-60 w-full">
-                            <canvas id="graficoResumo"></canvas>
-                        </div>
-                    </div>
-                `;
-
-                setTimeout(() => {
-                    const ctx = document.getElementById('graficoResumo');
-                    if (ctx) {
-                        if (resumoChart) resumoChart.destroy();
-                        const dias = Array.from({length: 30}, (_, i) => `${i + 1}`);
-                        const valoresPorDia = dias.map(d => {
-                            const dataDia = `${selectedMonth}-${String(d).padStart(2, '0')}`;
-                            return transactions.filter(t => t.data === dataDia).reduce((a, b) => a + b.valor, 0);
-                        });
-
-                        resumoChart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: dias,
-                                datasets: [{
-                                    label: 'Vendas (R$)',
-                                    data: valoresPorDia,
-                                    borderColor: '#10b981',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                    borderWidth: 3,
-                                    fill: true,
-                                    tension: 0.3
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                        });
-                    }
-                }, 50);
-
-            } else if (activeTab === 'VENDAS_LOJA') {
-                main.innerHTML = `
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 max-w-xl mx-auto mb-6">
-                        <h3 class="font-black text-slate-700 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-500"></i> Registrar Nova Venda na Nuvem
-                        </h3>
-                        <form id="formNovaVenda" onsubmit="salvarVenda(event)" class="space-y-3">
-                            <input type="text" id="descVenda" placeholder="Descrição (ex: Conjunto Infantil)" required class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" step="0.01" id="valorVenda" placeholder="Valor (R$)" required class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500">
-                                <input type="date" id="dataVenda" value="${new Date().toISOString().split('T')[0]}" required class="w-full p-3 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500">
-                            </div>
-                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all">
-                                Registrar na Nuvem
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 max-w-xl mx-auto">
-                        <h3 class="font-black text-slate-700 text-sm uppercase tracking-wider mb-4">Últimos Lançamentos</h3>
-                        <div class="space-y-2 max-h-80 overflow-y-auto">
-                            ${filtered.length > 0 ? filtered.slice(0, 15).map(t => `
-                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs sm:text-sm">
-                                    <div>
-                                        <p class="font-bold text-slate-800">${t.descricao}</p>
-                                        <p class="text-slate-400 text-xs">${t.data}</p>
-                                    </div>
-                                    <span class="font-black text-emerald-600">${formatCurrency(t.valor)}</span>
-                                </div>
-                            `).join('') : '<p class="text-center text-slate-400 text-sm py-4">Nenhum lançamento cadastrado neste mês.</p>'}
-                        </div>
-                    </div>
-                `;
-            } else if (activeTab === 'ANUAL') {
-                main.innerHTML = `
-                    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 text-center max-w-xl mx-auto mb-6">
-                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">FATURAMENTO TOTAL DO ANO (2026)</p>
-                        <h2 class="text-4xl font-black text-emerald-500 mb-4">${formatCurrency(totalFaturamento)}</h2>
-                        <div class="flex justify-center gap-8 border-t border-slate-100 pt-4 text-xs font-bold">
-                            <div><p class="text-slate-400">TOTAL VENDAS</p><p class="text-blue-600 text-lg">${qtdVendas}</p></div>
-                            <div><p class="text-slate-400">MÉDIA MENSAL</p><p class="text-purple-600 text-lg">${formatCurrency(totalFaturamento / 12)}</p></div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            lucide.createIcons();
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50/50 transition";
+            tr.innerHTML = `
+              <td class="py-3 px-2 font-medium text-slate-700">${item.description}</td>
+              <td class="py-3 px-2">
+                <span class="px-2 py-1 rounded-md text-xs font-bold ${item.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                  ${item.type === 'income' ? 'Entrada' : 'Saída'}
+                </span>
+              </td>
+              <td class="py-3 px-2 font-bold ${item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}">
+                R$ ${item.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </td>
+              <td class="py-3 px-2 text-right">
+                <button onclick="deleteTransaction('${id}')" class="p-1.5 text-slate-400 hover:text-rose-600 transition">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
         }
 
-        async function salvarVenda(e) {
-            e.preventDefault();
-            const descEl = document.getElementById('descVenda');
-            const valEl = document.getElementById('valorVenda');
-            const dataEl = document.getElementById('dataVenda');
+        // Atualizar Resumo
+        document.getElementById('totalIncomes').innerText = `R$ ${incomes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        document.getElementById('totalExpenses').innerText = `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        
+        const balance = incomes - expenses;
+        const balanceEl = document.getElementById('totalBalance');
+        balanceEl.innerText = `R$ ${balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        balanceEl.className = `text-2xl font-black mt-1 ${balance >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
 
-            const descricao = descEl.value.trim();
-            const valor = parseFloat(valEl.value);
-            const data = dataEl.value;
+        lucide.createIcons();
+      } catch (err) {
+        showModal("Erro", "Falha ao buscar lançamentos: " + err.message);
+      }
+    }
 
-            if (!descricao || isNaN(valor) || !data) {
-                showModal('Erro', 'Por favor, preencha todos os campos corretamente.');
-                return;
-            }
-
-            try {
-                await db.collection("se_lancamentos").add({
-                    descricao: descricao,
-                    valor: valor,
-                    tipo: 'receita',
-                    categoria: 'Vendas Loja',
-                    data: data,
-                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                descEl.value = '';
-                valEl.value = '';
-                showModal('Sucesso!', 'Lançamento registrado no Firebase com sucesso.');
-            } catch (err) {
-                console.error('Erro ao salvar no Firebase:', err);
-                showModal('Erro ao Salvar', `Detalhes: ${err.message || 'Verifique a conexão ou permissões do Firebase.'}`);
-            }
+    // Deletar Registro
+    async function deleteTransaction(id) {
+      if (confirm("Tem certeza que deseja apagar este registro?")) {
+        try {
+          await db.collection("transactions").doc(id).delete();
+          loadData();
+        } catch (err) {
+          showModal("Erro", "Erro ao apagar: " + err.message);
         }
+      }
+    }
 
-        carregarDados();
-    </script>
+    // Inicializar carregamento dos dados
+    window.onload = loadData;
+  </script>
 </body>
 </html>
